@@ -6,8 +6,8 @@ Github: https://github.com/Nebrok/UntitledDemise.git
 Author: @Nebrok
 """
 from constants import *
-from Player import Player
 from Environment import Environment
+from Player import Player
 
 
 def main():
@@ -22,41 +22,26 @@ def main():
     screen.fill(BLACK)
 
     dt = 0
-
-    gameSpace = Environment()
-
-    testPlayer = Player(gameSpace)
+    gameEnvironment = Environment(screen)
 
     while not done:
         #Event Checking
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                done = True
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                done = True
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-                testPlayer.move(pygame.Vector2(0,-1))
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-                testPlayer.move(pygame.Vector2(0,1))
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
-                testPlayer.move(pygame.Vector2(-1,0))
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
-                testPlayer.move(pygame.Vector2(1,0))
+        done = gameEnvironment.update_events()
 
         #Clears Screen
         screen.fill(BLACK)
 
-        testPlayer.update_position()
-        testPlayer.draw()
+        gameEnvironment.update_physics(dt)
+
+        gameEnvironment.draw()
 
         #Center of the screen
-        pygame.draw.circle(screen, RED, (640,360), 2)
+        #pygame.draw.circle(screen, RED, (640,360), 2)
 
         #End of Loop
         pygame.display.flip()
         #Delta time in seconds since last frame, clock.tick() sets max framerate
         dt = clock.tick(60) / 1000
-
     pygame.quit()
 
 
