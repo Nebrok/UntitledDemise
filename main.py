@@ -31,6 +31,7 @@ def main():
         #Clears Screen
         screen.fill(BLACK)
 
+        gameEnvironment.update_enemy()
         gameEnvironment.update_physics(dt)
 
         gameEnvironment.draw()

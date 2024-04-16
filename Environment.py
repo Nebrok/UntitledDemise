@@ -1,7 +1,7 @@
 from constants import *
 from Player import Player
 from Enemy import Enemy
-from random import randint
+
 
 class Environment():
     def __init__(self, screen):
@@ -58,6 +58,12 @@ class Environment():
         self.player.draw()
         for enemy in self._enemies:
             enemy.draw()
+    
+    def update_enemy(self):
+        playerPos = self.player.get_position()
+        for enemy in self._enemies:
+            enemy.move(playerPos)
+
 
     def update_physics(self, dt):
         self.player.update_physics(dt)

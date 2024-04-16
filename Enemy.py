@@ -9,6 +9,8 @@ class Enemy():
         self._acceleration = pygame.Vector2()
 
         self._dimensions = pygame.Vector2(32,32)
+
+        self._playerRelativeTarget = pygame.Vector2(randint(-100,100), randint(-100,100))
     
     def draw(self):
         positionRect = pygame.Rect(self._position + self._env.get_offset(), (self._dimensions.x,self._dimensions.y))
@@ -18,8 +20,14 @@ class Enemy():
 
     def update_physics(self, dt):
         self._velocity += self._acceleration
+        if self._velocity.magnitude() > ENEMY_MAX_SPEED:
+            self._velocity.scale_to_length(ENEMY_MAX_SPEED)
         self._position += self._velocity * dt
         self._acceleration *= 0
 
-    def move(self, acceleration):
-        self._acceleration += acceleration
+    def move(self, playerPosition):
+        positionDifference = (playerPosition + self._playerRelativeTarget - self._position 
+                              + pygame.Vector2(randint(-10,10),randint(-10,10)))
+        positionDifference.normalize()
+        positionDifference *= 1
+        self._acceleration += positionDifference

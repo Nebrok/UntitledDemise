@@ -1,5 +1,5 @@
 import pygame
-
+from random import randint
 # Colours
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -14,4 +14,5 @@ HEIGHT = 720
 WORLD_WIDTH = 5000
 WORLD_HEIGHT = 5000
 
-PLAYER_MAX_SPEED = 100
+PLAYER_MAX_SPEED = 150
+ENEMY_MAX_SPEED = 110
