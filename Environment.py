@@ -38,14 +38,16 @@ class Environment():
                 return True
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return True
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_w:
                 self.player.move(pygame.Vector2(0,-movementMag))
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                 self.player.move(pygame.Vector2(0,movementMag))
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
                 self.player.move(pygame.Vector2(-movementMag,0))
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_d:
                 self.player.move(pygame.Vector2(movementMag,0))
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                self.player.rotateSprite(15)
         return False
     
     def draw(self):
@@ -54,10 +56,10 @@ class Environment():
         positionRect.move_ip(-self._worldDimensions.x/2, -self._worldDimensions.y/2)
         pygame.draw.rect(self._screen, WHITE, positionRect, 3)
 
-        
-        self.player.draw()
         for enemy in self._enemies:
             enemy.draw()
+
+        self.player.draw()
     
     def update_enemy(self):
         playerPos = self.player.get_position()
@@ -66,9 +68,18 @@ class Environment():
 
 
     def update_physics(self, dt):
+        mousePos = pygame.Vector2(pygame.mouse.get_pos())
+        diffX = mousePos.x - WIDTH/2
+        diffY = -(mousePos.y - HEIGHT/2)
+        angle = math.degrees(math.atan2(diffY, diffX))
+        self.player.setRotation(angle - 90)
+
+
+
         self.player.update_physics(dt)
         for enemy in self._enemies:
             enemy.update_physics(dt)
+
 
         screenShift = self.player.get_velocity() * dt
         self._screenOffset -= screenShift

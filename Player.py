@@ -4,17 +4,25 @@ class Player():
     def __init__(self, env):
         self._env = env
 
+        self._sprite = pygame.image.load("Assets/PlayerSprite.png")
+
         self._position = pygame.Vector2(self._env.get_coords_at_centre())
         self._velocity = pygame.Vector2()
         self._acceleration = pygame.Vector2()
+        self._rotation = 90
 
         self._dimensions = pygame.Vector2(32,32)
     
     def draw(self):
-        positionRect = pygame.Rect((WIDTH/2, HEIGHT/2), (self._dimensions.x,self._dimensions.y))
-        #centres the Rect object around Player Position
-        positionRect.move_ip(-self._dimensions.x/2, -self._dimensions.y/2)
-        pygame.draw.rect(pygame.display.get_surface(), WHITE, positionRect)
+        finalSprite = pygame.transform.rotate(self._sprite, self._rotation)
+        rot_rect = finalSprite.get_rect(center = (WIDTH/2, HEIGHT/2))
+        pygame.display.get_surface().blit(finalSprite, rot_rect)
+            
+    def rotateSprite(self, angle):
+        self._rotation += angle
+    
+    def setRotation(self, angle):
+        self._rotation = angle
 
     def update_physics(self, dt):
         self._velocity += self._acceleration
