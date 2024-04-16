@@ -11,15 +11,23 @@ class Player():
         self._dimensions = pygame.Vector2(32,32)
     
     def draw(self):
-        positionRect = pygame.Rect(self._position + self._env.get_offset(), (self._dimensions.x,self._dimensions.y))
+        positionRect = pygame.Rect((WIDTH/2, HEIGHT/2), (self._dimensions.x,self._dimensions.y))
         #centres the Rect object around Player Position
         positionRect.move_ip(-self._dimensions.x/2, -self._dimensions.y/2)
         pygame.draw.rect(pygame.display.get_surface(), WHITE, positionRect)
 
     def update_physics(self, dt):
         self._velocity += self._acceleration
+        if self._velocity.magnitude() > PLAYER_MAX_SPEED:
+            self._velocity.scale_to_length(PLAYER_MAX_SPEED)
         self._position += self._velocity * dt
         self._acceleration *= 0
 
     def move(self, acceleration):
-        self._acceleration += acceleration * 10
+        self._acceleration += acceleration
+
+    def get_position(self):
+        return self._position
+    
+    def get_velocity(self):
+        return self._velocity
