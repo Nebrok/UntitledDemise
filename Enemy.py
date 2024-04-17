@@ -19,7 +19,7 @@ class Enemy():
         pygame.draw.ellipse(pygame.display.get_surface(), RED, positionRect)
 
     def update_physics(self, dt):
-        self._velocity += self._acceleration
+        self._velocity += self._acceleration * dt
         if self._velocity.magnitude() > ENEMY_MAX_SPEED:
             self._velocity.scale_to_length(ENEMY_MAX_SPEED)
         self._position += self._velocity * dt

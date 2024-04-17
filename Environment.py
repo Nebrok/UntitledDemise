@@ -13,6 +13,7 @@ class Environment():
         self.player = Player(self)
 
         self._enemies = []
+        self._bullets = []
 
         for i in range(10):
             enemy = Enemy(self, randint(-400, 400), randint(-400, 400))
@@ -32,7 +33,7 @@ class Environment():
         Loops through the entire pygame event queue. Returns True if
         the window is closed, otherwise returns False
         """
-        movementMag = 10
+        movementMag = 500
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
@@ -48,6 +49,8 @@ class Environment():
                 self.player.move(pygame.Vector2(movementMag,0))
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
                 self.player.rotateSprite(15)
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                self.player.fire_bullet()
         return False
     
     def draw(self):
@@ -75,29 +78,37 @@ class Environment():
             enemy.draw()
 
         self.player.draw()
+
+        for bullet in self._bullets:
+            bullet.draw()
     
     def update_enemy(self):
         playerPos = self.player.get_position()
         for enemy in self._enemies:
             enemy.move(playerPos)
 
-
     def update_physics(self, dt):
         mousePos = pygame.Vector2(pygame.mouse.get_pos())
         diffX = mousePos.x - WIDTH/2
         diffY = -(mousePos.y - HEIGHT/2)
         angle = math.degrees(math.atan2(diffY, diffX))
-        self.player.setRotation(angle - 90)
-
-
+        self.player.setRotation(angle)
 
         self.player.update_physics(dt)
         for enemy in self._enemies:
             enemy.update_physics(dt)
 
-
+        if len(self._bullets) > 0:
+            for i in range(len(self._bullets)-1, 0-1, -1):
+                self._bullets[i].update_physics(dt)
+                if self._bullets[i].get_age() > 10:
+                    self._bullets.pop(i)
+        
         screenShift = self.player.get_velocity() * dt
         self._screenOffset -= screenShift
         self._worldCoordsAtScreenCentre = self.player.get_position()
+
+    def get_bullets(self):
+        return self._bullets
 
     
