@@ -56,6 +56,21 @@ class Environment():
         positionRect.move_ip(-self._worldDimensions.x/2, -self._worldDimensions.y/2)
         pygame.draw.rect(self._screen, WHITE, positionRect, 3)
 
+
+        gridGap = 100
+        for i in range(int(WORLD_WIDTH/gridGap)):
+            xCoord = -(WORLD_WIDTH/2) + i * gridGap + self._screenOffset.x
+            yCoord = (WORLD_HEIGHT/2)
+            startPos = (xCoord, -yCoord + self._screenOffset.y)
+            endPos = (xCoord, yCoord + self._screenOffset.y)
+            pygame.draw.line(self._screen, GREY, startPos, endPos)
+        for i in range(int(WORLD_HEIGHT/gridGap)):
+            xCoord = (WORLD_WIDTH/2) 
+            yCoord = (-WORLD_HEIGHT/2) + i * gridGap + self._screenOffset.y
+            startPos = (-xCoord + self._screenOffset.x, yCoord)
+            endPos = (xCoord + self._screenOffset.x, yCoord)
+            pygame.draw.line(self._screen, GREY, startPos, endPos)
+
         for enemy in self._enemies:
             enemy.draw()
 
