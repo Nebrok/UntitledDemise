@@ -109,8 +109,7 @@ class Environment():
                     if distance <= 21: #5 + 32 radi of bullet and enemy respectively
                         self._enemies.pop(j)
                         self._bullets.pop(i)
-                        if len(self._bullets) <= 0:
-                            break
+                        break
         
 
         
