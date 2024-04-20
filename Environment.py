@@ -103,6 +103,16 @@ class Environment():
                 self._bullets[i].update_physics(dt)
                 if self._bullets[i].get_age() > 10:
                     self._bullets.pop(i)
+                    continue
+                for j in range(len(self._enemies)-1, 0-1, -1):
+                    distance = self._bullets[i].get_position().distance_to(self._enemies[j].get_position())
+                    if distance <= 21: #5 + 32 radi of bullet and enemy respectively
+                        self._enemies.pop(j)
+                        self._bullets.pop(i)
+                        if len(self._bullets) <= 0:
+                            break
+        
+
         
         screenShift = self.player.get_velocity() * dt
         self._screenOffset -= screenShift

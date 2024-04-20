@@ -31,3 +31,6 @@ class Enemy():
         positionDifference.normalize()
         positionDifference *= 1
         self._acceleration += positionDifference
+    
+    def get_position(self):
+        return self._position

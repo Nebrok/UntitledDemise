@@ -36,12 +36,12 @@ def main():
 
         gameEnvironment.draw()
 
-        #Center of the screen
+        #Center of the screensssss
         #pygame.draw.circle(screen, RED, (640,360), 2)
 
         #End of Loop
         pygame.display.flip()
-        #Delta time in seconds since last frame, clock.tick() sets max framerate
+        #Delta time in seconds since last frame, clock.tick() also sets max framerate
         dt = clock.tick(60) / 1000
         print(clock.get_fps())
     pygame.quit()

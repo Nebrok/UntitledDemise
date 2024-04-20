@@ -22,7 +22,7 @@ class Bullet():
         pygame.draw.circle(pygame.display.get_surface(), BLUE, self._position + self._env.get_offset(), 5)
 
     def update_physics(self, dt):
-        #self._velocity += self._acceleration * dt
+        self._velocity += self._acceleration * dt
         self._position += self._velocity * dt
         self._acceleration *= 0
 
