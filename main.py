@@ -12,6 +12,7 @@ from Player import Player
 
 def main():
     pygame.init()
+    pygame.font.init()
 
     SIZE = (WIDTH,HEIGHT)
     screen = pygame.display.set_mode(SIZE)
@@ -23,6 +24,7 @@ def main():
 
     dt = 0
     gameEnvironment = Environment(screen)
+    
 
     while not done:
         #Event Checking
@@ -35,8 +37,9 @@ def main():
         gameEnvironment.update_physics(dt)
 
         gameEnvironment.draw()
+        gameEnvironment.render_HUD()
 
-        #Center of the screensssss
+        #Center of the screens
         #pygame.draw.circle(screen, RED, (640,360), 2)
 
         #End of Loop

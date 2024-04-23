@@ -10,16 +10,22 @@ class Environment():
         self._screenOffset = pygame.Vector2(WIDTH/2, HEIGHT/2)
         self._worldCoordsAtScreenCentre = pygame.Vector2()
 
+        self._fontObject = pygame.font.Font(None, 50)
+
         self.player = Player(self)
 
         self._enemies = []
         self._bullets = []
+
+        self._score = 0
 
         for i in range(10):
             enemy = Enemy(self, randint(-400, 400), randint(-400, 400))
             self._enemies.append(enemy)
 
         #pygame system changes
+        #Changes key press behaviour, where if key is held down registers as
+        #new press after given milliseconds
         pygame.key.set_repeat(100)
 
     def get_offset(self):
@@ -106,7 +112,8 @@ class Environment():
                     continue
                 for j in range(len(self._enemies)-1, 0-1, -1):
                     distance = self._bullets[i].get_position().distance_to(self._enemies[j].get_position())
-                    if distance <= 21: #5 + 32 radi of bullet and enemy respectively
+                    if distance <= 21: #5 + 16 radi of bullet and enemy respectively
+                        self._score += SCORE_INCREASE_ON_DEATH
                         self._enemies.pop(j)
                         self._bullets.pop(i)
                         break
@@ -120,4 +127,11 @@ class Environment():
     def get_bullets(self):
         return self._bullets
 
+    def render_HUD(self):
+        currentScore = str(self._score)
+        fontSurface = self._fontObject.render("Score: " + currentScore, True, WHITE)
+        fontSurfaceRect = fontSurface.get_rect()
+        fontSurfaceRect.y = HEIGHT - fontSurfaceRect.height
+        fontSurfaceRect.x += 5
+        pygame.display.get_surface().blit(fontSurface, fontSurfaceRect)
     
