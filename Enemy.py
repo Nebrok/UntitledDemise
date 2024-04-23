@@ -33,4 +33,7 @@ class Enemy():
         self._acceleration += positionDifference
     
     def get_position(self):
-        return self._position
+        return self._position.copy()
+    
+    def get_dimensions(self):
+        return self._dimensions.copy()

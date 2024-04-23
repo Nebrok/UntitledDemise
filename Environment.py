@@ -18,8 +18,11 @@ class Environment():
         self._bullets = []
 
         self._score = 0
+        self._playerLives = 3
+        self._lifeLostFlag = False
+        self._gameOver = False
 
-        for i in range(10):
+        for i in range(1):
             enemy = Enemy(self, randint(-400, 400), randint(-400, 400))
             self._enemies.append(enemy)
 
@@ -57,6 +60,11 @@ class Environment():
                 self.player.rotateSprite(15)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.player.fire_bullet()
+        
+        if self._lifeLostFlag:
+            self.player.life_lost()
+            self._playerLives -= 1
+            self._lifeLostFlag = False
         return False
     
     def draw(self):
@@ -103,6 +111,9 @@ class Environment():
         self.player.update_physics(dt)
         for enemy in self._enemies:
             enemy.update_physics(dt)
+            if self.player.collides(enemy):
+                self._playerLives -= 1
+                self._lifeLostFlag = True
 
         if len(self._bullets) > 0:
             for i in range(len(self._bullets)-1, 0-1, -1):
@@ -113,13 +124,14 @@ class Environment():
                 for j in range(len(self._enemies)-1, 0-1, -1):
                     distance = self._bullets[i].get_position().distance_to(self._enemies[j].get_position())
                     if distance <= 21: #5 + 16 radi of bullet and enemy respectively
-                        self._score += SCORE_INCREASE_ON_DEATH
+                        self._score += SCORE_INCREASE_ON_ENEMY_DEATH
                         self._enemies.pop(j)
                         self._bullets.pop(i)
                         break
         
 
-        
+        #Used to calculate the offset between world coordintates and the camera
+        # view, required to properly display entities
         screenShift = self.player.get_velocity() * dt
         self._screenOffset -= screenShift
         self._worldCoordsAtScreenCentre = self.player.get_position()

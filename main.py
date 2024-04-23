@@ -46,7 +46,7 @@ def main():
         pygame.display.flip()
         #Delta time in seconds since last frame, clock.tick() also sets max framerate
         dt = clock.tick(60) / 1000
-        print(clock.get_fps())
+        #print(clock.get_fps())
     pygame.quit()
 
 

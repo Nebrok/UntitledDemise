@@ -44,3 +44,24 @@ class Player():
     def fire_bullet(self):
         new_bullet = Bullet(self._env, self._position.copy(), self._rotation, self._velocity.copy())
         self._env.get_bullets().append(new_bullet)
+    
+    def collides(self, enemy):
+        playerBottomLeftX = self._position.x - self._dimensions.x/2
+        playerBottomLeftY = self._position.y + self._dimensions.y/2
+
+        playerTopRightX = self._position.x + self._dimensions.x/2
+        playerTopRightY = self._position.y - self._dimensions.y/2
+
+        enemyCentre = enemy.get_position()
+        enemyRadius = enemy.get_dimensions().x/2
+
+        closestX = max(playerBottomLeftX, min(enemyCentre.x, playerTopRightX))
+        closestY = min(max(playerTopRightY, enemyCentre.y), playerBottomLeftY)
+
+        diffX = closestX - enemyCentre.x
+        diffY = closestY - enemyCentre.y
+
+        return (diffX**2 + diffY**2) <= enemyRadius**2
+    
+    def life_lost(self):
+        print("Life Lost")
