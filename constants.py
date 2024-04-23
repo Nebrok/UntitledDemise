@@ -1,5 +1,5 @@
 import pygame
-from random import randint
+from random import randint, random
 import os
 import math
 
@@ -17,6 +17,8 @@ HEIGHT = 720
 
 WORLD_WIDTH = 5000
 WORLD_HEIGHT = 5000
+HALF_WORLD_WIDTH = int(WORLD_WIDTH/2)
+HALF_WORLD_HEIGHT = int(WORLD_HEIGHT/2)
 
 PLAYER_MAX_SPEED = 200
 ENEMY_MAX_SPEED = 110

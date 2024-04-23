@@ -101,6 +101,11 @@ class Environment():
             bullet.draw()
     
     def update_enemy(self):
+        coinflip = random()
+        if coinflip <= 0.02:
+            newEnemy = Enemy(self, randint(-HALF_WORLD_WIDTH, HALF_WORLD_WIDTH),
+                              randint(-HALF_WORLD_HEIGHT,HALF_WORLD_HEIGHT))
+            self._enemies.append(newEnemy)
         playerPos = self.player.get_position()
         for enemy in self._enemies:
             enemy.move(playerPos)
