@@ -33,14 +33,7 @@ def main():
         #Clears Screen
         screen.fill(BLACK)
 
-        gameEnvironment.update_enemy()
-        gameEnvironment.update_physics(dt)
-
-        gameEnvironment.draw()
-        gameEnvironment.render_HUD()
-
-        #Center of the screens
-        #pygame.draw.circle(screen, RED, (640,360), 2)
+        gameEnvironment.game_logic(dt)
 
         #End of Loop
         pygame.display.flip()

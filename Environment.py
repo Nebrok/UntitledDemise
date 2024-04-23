@@ -10,7 +10,12 @@ class Environment():
         self._screenOffset = pygame.Vector2(WIDTH/2, HEIGHT/2)
         self._worldCoordsAtScreenCentre = pygame.Vector2()
 
-        self._fontObject = pygame.font.Font(None, 50)
+        self._fontHUD = pygame.font.Font(None, 50)
+        self._fontTitle = pygame.font.Font(None, 100)
+        self._fontInfo = pygame.font.Font(None, 30)
+
+        self.gameStates = ["Start", "Run", "End"]
+        self.gameState = 0
 
         self.player = Player(self)
 
@@ -21,10 +26,6 @@ class Environment():
         self._playerLives = 3
         self._lifeLostFlag = False
         self._gameOver = False
-
-        for i in range(1):
-            enemy = Enemy(self, randint(-400, 400), randint(-400, 400))
-            self._enemies.append(enemy)
 
         #pygame system changes
         #Changes key press behaviour, where if key is held down registers as
@@ -42,31 +43,50 @@ class Environment():
         Loops through the entire pygame event queue. Returns True if
         the window is closed, otherwise returns False
         """
+
+        srtFlag = False
+        runFlag = False
+        endFlag = False
+        if self.gameState == 0:
+            srtFlag = True
+            runFlag = False
+            endFlag = False
+        elif self.gameState == 1:
+            srtFlag = False
+            runFlag = True
+            endFlag = False
+        elif self.gameState == 2:
+            srtFlag = False
+            runFlag = False
+            endFlag = True
+
         movementMag = 500
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                self.gameState = 2
+            if (event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN) and srtFlag:
+                self.gameState = 1
+            if (event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN) and endFlag:
                 return True
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_w:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_w and runFlag:
                 self.player.move(pygame.Vector2(0,-movementMag))
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_s and runFlag:
                 self.player.move(pygame.Vector2(0,movementMag))
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_a:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_a and runFlag:
                 self.player.move(pygame.Vector2(-movementMag,0))
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_d:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_d and runFlag:
                 self.player.move(pygame.Vector2(movementMag,0))
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r and runFlag:
                 self.player.rotateSprite(15)
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and runFlag:
                 self.player.fire_bullet()
         
         if self._lifeLostFlag:
             self._playerLives -= 1
-            print("Life Lost")
             if self._playerLives == 0:
-                print("GAME OVER!!")
-                return True
+                self.gameState = 2
             self.player.life_lost()
             self._lifeLostFlag = False
         
@@ -149,15 +169,61 @@ class Environment():
 
     def render_HUD(self):
         currentScore = str(self._score)
-        scoreSurface = self._fontObject.render("Score: " + currentScore, True, WHITE)
+        scoreSurface = self._fontHUD.render("Score: " + currentScore, True, WHITE)
         scoreSurfaceRect = scoreSurface.get_rect()
         scoreSurfaceRect.y = HEIGHT - scoreSurfaceRect.height
         scoreSurfaceRect.x += 5
         pygame.display.get_surface().blit(scoreSurface, scoreSurfaceRect)
 
         numLives = str(self._playerLives)
-        livesSurface = self._fontObject.render("Lives: " + numLives, True, WHITE)
+        livesSurface = self._fontHUD.render("Lives: " + numLives, True, WHITE)
         livesSurfaceRect = livesSurface.get_rect()
         livesSurfaceRect.y = HEIGHT - livesSurfaceRect.height
         livesSurfaceRect.x += scoreSurfaceRect.width + 30
         pygame.display.get_surface().blit(livesSurface, livesSurfaceRect)
+
+    def game_logic(self, dt):
+        if self.gameState == 0:
+            self.start_game()
+        elif self.gameState == 1:
+            self.run_game(dt)
+        elif self.gameState == 2:
+            self.end_game()
+        else:
+            print("Invalid Game State flag")
+
+    def render_start_display(self):
+        titleSurface = self._fontTitle.render("UNTITLED DEMISE", True, WHITE)
+        titleSurfaceRect = titleSurface.get_rect(center=(int(WIDTH/2), int(HEIGHT/3)))
+        pygame.display.get_surface().blit(titleSurface, titleSurfaceRect)
+
+        infoSurface = self._fontInfo.render("Press any button to start the game", True, WHITE)
+        infoSurfaceRect = infoSurface.get_rect(center=(int(WIDTH/2), int(HEIGHT/2)))
+        pygame.display.get_surface().blit(infoSurface, infoSurfaceRect)
+
+    def start_game(self):
+        self.render_start_display()
+
+    def run_game(self, dt):
+        self.update_enemy()
+        self.update_physics(dt)
+
+        self.draw()
+        self.render_HUD()
+
+    def render_end_display(self):
+        tauntSurface = self._fontTitle.render("GAME OVER!", True, WHITE)
+        tauntSurfaceRect = tauntSurface.get_rect(center=(int(WIDTH/2), int(HEIGHT/3)))
+        pygame.display.get_surface().blit(tauntSurface, tauntSurfaceRect)
+
+        currentScore = str(self._score)
+        scoreSurface = self._fontInfo.render("Final Score: " + currentScore, True, WHITE)
+        scoreSurfaceRect = scoreSurface.get_rect(center=(int(WIDTH/2), int(HEIGHT/2)))
+        pygame.display.get_surface().blit(scoreSurface, scoreSurfaceRect)
+
+        infoSurface = self._fontInfo.render("Press any button to end the game", True, WHITE)
+        infoSurfaceRect = infoSurface.get_rect(center=(int(WIDTH/2), int(HEIGHT/2) + scoreSurfaceRect.h + 10))
+        pygame.display.get_surface().blit(infoSurface, infoSurfaceRect)
+
+    def end_game(self):
+        self.render_end_display()
