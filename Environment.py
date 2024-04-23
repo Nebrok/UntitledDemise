@@ -62,9 +62,14 @@ class Environment():
                 self.player.fire_bullet()
         
         if self._lifeLostFlag:
-            self.player.life_lost()
             self._playerLives -= 1
+            print("Life Lost")
+            if self._playerLives == 0:
+                print("GAME OVER!!")
+                return True
+            self.player.life_lost()
             self._lifeLostFlag = False
+        
         return False
     
     def draw(self):
@@ -72,7 +77,6 @@ class Environment():
         #centres the Rect object around the Entities Position
         positionRect.move_ip(-self._worldDimensions.x/2, -self._worldDimensions.y/2)
         pygame.draw.rect(self._screen, WHITE, positionRect, 3)
-
 
         gridGap = 100
         for i in range(int(WORLD_WIDTH/gridGap)):
@@ -112,7 +116,6 @@ class Environment():
         for enemy in self._enemies:
             enemy.update_physics(dt)
             if self.player.collides(enemy):
-                self._playerLives -= 1
                 self._lifeLostFlag = True
 
         if len(self._bullets) > 0:
@@ -133,7 +136,7 @@ class Environment():
         #Used to calculate the offset between world coordintates and the camera
         # view, required to properly display entities
         screenShift = self.player.get_velocity() * dt
-        self._screenOffset -= screenShift
+        self._screenOffset = self.player.get_position() * -1 + (WIDTH/2, HEIGHT/2)
         self._worldCoordsAtScreenCentre = self.player.get_position()
 
     def get_bullets(self):
@@ -141,9 +144,15 @@ class Environment():
 
     def render_HUD(self):
         currentScore = str(self._score)
-        fontSurface = self._fontObject.render("Score: " + currentScore, True, WHITE)
-        fontSurfaceRect = fontSurface.get_rect()
-        fontSurfaceRect.y = HEIGHT - fontSurfaceRect.height
-        fontSurfaceRect.x += 5
-        pygame.display.get_surface().blit(fontSurface, fontSurfaceRect)
-    
+        scoreSurface = self._fontObject.render("Score: " + currentScore, True, WHITE)
+        scoreSurfaceRect = scoreSurface.get_rect()
+        scoreSurfaceRect.y = HEIGHT - scoreSurfaceRect.height
+        scoreSurfaceRect.x += 5
+        pygame.display.get_surface().blit(scoreSurface, scoreSurfaceRect)
+
+        numLives = str(self._playerLives)
+        livesSurface = self._fontObject.render("Lives: " + numLives, True, WHITE)
+        livesSurfaceRect = livesSurface.get_rect()
+        livesSurfaceRect.y = HEIGHT - livesSurfaceRect.height
+        livesSurfaceRect.x += scoreSurfaceRect.width + 30
+        pygame.display.get_surface().blit(livesSurface, livesSurfaceRect)

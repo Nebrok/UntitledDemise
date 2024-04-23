@@ -36,10 +36,10 @@ class Player():
         self._acceleration += acceleration
 
     def get_position(self):
-        return self._position
+        return self._position.copy()
     
     def get_velocity(self):
-        return self._velocity
+        return self._velocity.copy()
     
     def fire_bullet(self):
         new_bullet = Bullet(self._env, self._position.copy(), self._rotation, self._velocity.copy())
@@ -64,4 +64,5 @@ class Player():
         return (diffX**2 + diffY**2) <= enemyRadius**2
     
     def life_lost(self):
-        print("Life Lost")
+        self._position = pygame.Vector2()
+        

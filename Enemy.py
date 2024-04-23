@@ -10,7 +10,7 @@ class Enemy():
 
         self._dimensions = pygame.Vector2(32,32)
 
-        self._playerRelativeTarget = pygame.Vector2(randint(-100,100), randint(-100,100))
+        self._playerRelativeTarget = pygame.Vector2(0,0)
     
     def draw(self):
         positionRect = pygame.Rect(self._position + self._env.get_offset(), (self._dimensions.x,self._dimensions.y))
