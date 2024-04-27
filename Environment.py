@@ -1,6 +1,7 @@
 from constants import *
 from Player import Player
 from Enemy import Enemy
+from Asteroid import Asteroid
 
 
 class Environment():
@@ -26,6 +27,8 @@ class Environment():
         self._playerLives = 3
         self._lifeLostFlag = False
         self._gameOver = False
+
+        self._backgroundImage = pygame.Surface.convert_alpha(pygame.image.load("Assets/Spacebackground.png"))
 
         #pygame system changes
         #Changes key press behaviour, where if key is held down registers as
@@ -98,6 +101,10 @@ class Environment():
         positionRect.move_ip(-self._worldDimensions.x/2, -self._worldDimensions.y/2)
         pygame.draw.rect(self._screen, WHITE, positionRect, 3)
 
+        #uncomment to draw space image to background 
+        #rot_rect = self._backgroundImage.get_rect(center = self._screenOffset)
+        #pygame.display.get_surface().blit(self._backgroundImage, rot_rect)
+
         gridGap = 100
         for i in range(int(WORLD_WIDTH/gridGap)):
             xCoord = -(WORLD_WIDTH/2) + i * gridGap + self._screenOffset.x
@@ -123,7 +130,7 @@ class Environment():
     def update_enemy(self):
         coinflip = random()
         if coinflip <= 0.02:
-            newEnemy = Enemy(self, randint(-HALF_WORLD_WIDTH, HALF_WORLD_WIDTH),
+            newEnemy = Asteroid(self, randint(-HALF_WORLD_WIDTH, HALF_WORLD_WIDTH),
                               randint(-HALF_WORLD_HEIGHT,HALF_WORLD_HEIGHT))
             self._enemies.append(newEnemy)
         playerPos = self.player.get_position()

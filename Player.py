@@ -5,7 +5,7 @@ class Player():
     def __init__(self, env):
         self._env = env
 
-        self._sprite = pygame.image.load("Assets/PlayerSprite.png")
+        self._sprite = pygame.image.load("Assets/PlayerSpriteFinal3.png")
 
         self._position = pygame.Vector2(self._env.get_coords_at_centre())
         self._velocity = pygame.Vector2()
