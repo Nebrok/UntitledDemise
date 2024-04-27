@@ -2,6 +2,7 @@ from constants import *
 from Player import Player
 from Enemy import Enemy
 from Asteroid import Asteroid
+from Quadtree import QuadTree, AABB
 
 
 class Environment():
@@ -19,6 +20,9 @@ class Environment():
         self.gameState = 0
 
         self.player = Player(self)
+
+        self._quadtree = QuadTree(pygame.Vector2(0,0),HALF_WORLD_WIDTH, HALF_WORLD_HEIGHT, 0)
+        self._enemyQuadtree = QuadTree(pygame.Vector2(0,0),HALF_WORLD_WIDTH, HALF_WORLD_HEIGHT, 0)
 
         self._enemies = []
         self._bullets = []
@@ -71,7 +75,7 @@ class Environment():
                 self.gameState = 2
             if (event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN) and srtFlag:
                 self.gameState = 1
-            if (event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN) and endFlag:
+            if (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE) and endFlag:
                 return True
             if event.type == pygame.KEYDOWN and event.key == pygame.K_w and runFlag:
                 self.player.move(pygame.Vector2(0,-movementMag))
@@ -127,6 +131,20 @@ class Environment():
         for bullet in self._bullets:
             bullet.draw()
     
+    def update_trees(self):
+        #print("running tree update")
+        self._quadtree.clear_tree()
+        self._enemyQuadtree.clear_tree()
+        
+        self._quadtree.insert(self.player)
+
+        for enemy in self._enemies:
+            self._enemyQuadtree.insert(enemy)
+
+        for bullet in self._bullets:
+            self._quadtree.insert(bullet)
+        #print("tree update complete")
+
     def update_enemy(self):
         coinflip = random()
         if coinflip <= 0.02:
@@ -147,8 +165,14 @@ class Environment():
         self.player.update_physics(dt)
         for enemy in self._enemies:
             enemy.update_physics(dt)
+        
+        nearby_enemies = []
+        area_around_player = AABB(self.player.get_position(), 100, 100)
+        nearby_enemies = self._enemyQuadtree.contained_by(area_around_player)
+        for enemy in nearby_enemies:
             if self.player.collides(enemy):
                 self._lifeLostFlag = True
+                break
 
         if len(self._bullets) > 0:
             for i in range(len(self._bullets)-1, 0-1, -1):
@@ -156,6 +180,16 @@ class Environment():
                 if self._bullets[i].get_age() > 10:
                     self._bullets.pop(i)
                     continue
+                area_around_bullet = AABB(self._bullets[i].get_position(), 50, 50)
+                nearby_enemies = self._enemyQuadtree.contained_by(area_around_bullet)
+                for enemy in nearby_enemies:
+                    distance = self._bullets[i].get_position().distance_to(enemy.get_position())
+                    if distance <= 21: #5 + 16 radi of bullet and enemy respectively
+                        self._score += SCORE_INCREASE_ON_ENEMY_DEATH
+                        self._enemies.remove(enemy)
+                        self._bullets.remove(self._bullets[i])
+                        break
+                """
                 for j in range(len(self._enemies)-1, 0-1, -1):
                     distance = self._bullets[i].get_position().distance_to(self._enemies[j].get_position())
                     if distance <= 21: #5 + 16 radi of bullet and enemy respectively
@@ -163,11 +197,11 @@ class Environment():
                         self._enemies.pop(j)
                         self._bullets.pop(i)
                         break
+                """
         
 
         #Used to calculate the offset between world coordintates and the camera
         # view, required to properly display entities
-        screenShift = self.player.get_velocity() * dt
         self._screenOffset = self.player.get_position() * -1 + (WIDTH/2, HEIGHT/2)
         self._worldCoordsAtScreenCentre = self.player.get_position()
 
@@ -212,6 +246,7 @@ class Environment():
         self.render_start_display()
 
     def run_game(self, dt):
+        self.update_trees()
         self.update_enemy()
         self.update_physics(dt)
 
