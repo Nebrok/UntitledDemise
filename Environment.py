@@ -3,6 +3,7 @@ from Player import Player
 from Enemy import Enemy
 from Asteroid import Asteroid
 from Quadtree import QuadTree, AABB
+from perlin_noise import PerlinNoise
 
 
 class Environment():
@@ -27,6 +28,12 @@ class Environment():
         self._enemies = []
         self._bullets = []
 
+        self._asteroid_spawn_map = []
+        self._noise_generator = PerlinNoise(octaves=24)
+        self._spawn_map_x_resolution, self._spawn_map_y_resolution = 100, 100
+        self._spawn_cell_width = WORLD_WIDTH/self._spawn_map_x_resolution
+        self._spawn_cell_height = WORLD_HEIGHT/self._spawn_map_y_resolution
+
         self._score = 0
         self._playerLives = 3
         self._lifeLostFlag = False
@@ -34,10 +41,36 @@ class Environment():
 
         self._backgroundImage = pygame.Surface.convert_alpha(pygame.image.load("Assets/Spacebackground.png"))
 
+        #generate the map
+        self.load_map()
+
         #pygame system changes
         #Changes key press behaviour, where if key is held down registers as
         #new press after given milliseconds
         pygame.key.set_repeat(10)
+
+    def load_map(self):
+        # generates the spawn map for asteroids 
+        for i in range(self._spawn_map_x_resolution):
+            row = []
+            for j in range(self._spawn_map_y_resolution):
+                noise_val = self._noise_generator([i/self._spawn_map_x_resolution/10, j/self._spawn_map_y_resolution/5])
+                if not (noise_val > -0.08 and noise_val < 0.09):
+                    noise_val = 0
+                else:
+                    noise_val = 1
+                row.append(noise_val)
+            self._asteroid_spawn_map.append(row)
+        
+        # generate asteroids
+        for i in range(1000):
+            spawn_location = pygame.Vector2(randint(-HALF_WORLD_WIDTH, HALF_WORLD_WIDTH),
+                                randint(-HALF_WORLD_HEIGHT,HALF_WORLD_HEIGHT))
+            spawn_grid_x_coords = int(math.floor((spawn_location.x + HALF_WORLD_WIDTH) / self._spawn_cell_width)) - 1
+            spawn_grid_y_coords = int(math.floor((spawn_location.y + HALF_WORLD_HEIGHT) / self._spawn_cell_height)) - 1
+            if self._asteroid_spawn_map[spawn_grid_x_coords][spawn_grid_y_coords] == 1:
+                newEnemy = Asteroid(self, spawn_location.x, spawn_location.y)
+                self._enemies.append(newEnemy)
 
     def get_offset(self):
         return self._screenOffset
@@ -123,7 +156,10 @@ class Environment():
             endPos = (xCoord + self._screenOffset.x, yCoord)
             pygame.draw.line(self._screen, GREY, startPos, endPos)
 
-        for enemy in self._enemies:
+        nearby_enemies = []
+        area_around_player = AABB(self.player.get_position(), WIDTH/2 + 150, HEIGHT/2 + 150)
+        nearby_enemies = self._enemyQuadtree.contained_by(area_around_player)
+        for enemy in nearby_enemies:
             enemy.draw()
 
         self.player.draw()
@@ -146,14 +182,10 @@ class Environment():
         #print("tree update complete")
 
     def update_enemy(self):
-        coinflip = random()
-        if coinflip <= 0.02:
-            newEnemy = Asteroid(self, randint(-HALF_WORLD_WIDTH, HALF_WORLD_WIDTH),
-                              randint(-HALF_WORLD_HEIGHT,HALF_WORLD_HEIGHT))
-            self._enemies.append(newEnemy)
         playerPos = self.player.get_position()
         for enemy in self._enemies:
-            enemy.move(playerPos)
+            #enemy.move(playerPos)
+            pass
 
     def update_physics(self, dt):
         mousePos = pygame.Vector2(pygame.mouse.get_pos())
@@ -190,16 +222,6 @@ class Environment():
                         self._enemies.remove(enemy)
                         self._bullets.remove(self._bullets[i])
                         break
-                """
-                for j in range(len(self._enemies)-1, 0-1, -1):
-                    distance = self._bullets[i].get_position().distance_to(self._enemies[j].get_position())
-                    if distance <= 21: #5 + 16 radi of bullet and enemy respectively
-                        self._score += SCORE_INCREASE_ON_ENEMY_DEATH
-                        self._enemies.pop(j)
-                        self._bullets.pop(i)
-                        break
-                """
-        
 
         #Used to calculate the offset between world coordintates and the camera
         # view, required to properly display entities
