@@ -1,5 +1,4 @@
 import pygame
-import numpy as np
 
 """
 TODO:
@@ -187,15 +186,3 @@ class QuadTree():
         self._north_east = None
         self._south_west = None
         self._south_east = None
-
-def main():
-    centre1 = Point(100,100)
-    rect1 = AABB(centre1, 50, 50)
-
-    centre2 = Point(150,50)
-    rect2 = AABB(centre2, 50, 50)
-
-    print(rect1.contains_point(centre2))
-
-if __name__ == "__main__":
-    main()

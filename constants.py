@@ -26,5 +26,3 @@ BULLET_SPEED = 300
 
 SCORE_INCREASE_ON_ENEMY_DEATH = 100
 
-ASTEROID_SPRITE = 1#pygame.Surface.convert_alpha(pygame.image.load("Assets/AsteroidSprite.png"))
-

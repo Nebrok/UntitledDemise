@@ -17,14 +17,13 @@ class Environment():
         self._fontTitle = pygame.font.Font(None, 100)
         self._fontInfo = pygame.font.Font(None, 30)
 
-        self.gameStates = ["Start", "Run", "End"]
+        #Game States 0 = "Start", 1 = "Run", 2 = "End"
         self.gameState = 0
 
         self.player = Player(self)
 
         self._quadtree = QuadTree(pygame.Vector2(0,0),HALF_WORLD_WIDTH, HALF_WORLD_HEIGHT, 0)
         self._enemyQuadtree = QuadTree(pygame.Vector2(0,0),HALF_WORLD_WIDTH, HALF_WORLD_HEIGHT, 0)
-
         self._enemies = []
         self._bullets = []
 
@@ -71,12 +70,6 @@ class Environment():
             if self._asteroid_spawn_map[spawn_grid_x_coords][spawn_grid_y_coords] == 1:
                 newEnemy = Asteroid(self, spawn_location.x, spawn_location.y)
                 self._enemies.append(newEnemy)
-
-    def get_offset(self):
-        return self._screenOffset
-    
-    def get_coords_at_centre(self):
-        return self._worldCoordsAtScreenCentre
     
     def update_events(self):
         """
@@ -228,9 +221,6 @@ class Environment():
         self._screenOffset = self.player.get_position() * -1 + (WIDTH/2, HEIGHT/2)
         self._worldCoordsAtScreenCentre = self.player.get_position()
 
-    def get_bullets(self):
-        return self._bullets
-
     def render_HUD(self):
         currentScore = str(self._score)
         scoreSurface = self._fontHUD.render("Score: " + currentScore, True, WHITE)
@@ -292,3 +282,12 @@ class Environment():
 
     def end_game(self):
         self.render_end_display()
+
+    def get_offset(self):
+        return self._screenOffset
+    
+    def get_coords_at_centre(self):
+        return self._worldCoordsAtScreenCentre
+    
+    def get_bullets(self):
+        return self._bullets
