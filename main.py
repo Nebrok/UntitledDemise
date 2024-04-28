@@ -42,6 +42,5 @@ def main():
         print("FPS: " + str(clock.get_fps()))
     pygame.quit()
 
-
 if __name__ == "__main__":
     main()

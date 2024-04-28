@@ -37,7 +37,7 @@ class Environment():
         #pygame system changes
         #Changes key press behaviour, where if key is held down registers as
         #new press after given milliseconds
-        pygame.key.set_repeat(100)
+        pygame.key.set_repeat(10)
 
     def get_offset(self):
         return self._screenOffset
@@ -67,7 +67,7 @@ class Environment():
             runFlag = False
             endFlag = True
 
-        movementMag = 500
+        movementMag = 5000
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
@@ -184,8 +184,9 @@ class Environment():
                 nearby_enemies = self._enemyQuadtree.contained_by(area_around_bullet)
                 for enemy in nearby_enemies:
                     distance = self._bullets[i].get_position().distance_to(enemy.get_position())
-                    if distance <= 21: #5 + 16 radi of bullet and enemy respectively
+                    if distance <= 21 and not enemy.is_destroyed(): #5 + 16 radi of bullet and enemy respectively
                         self._score += SCORE_INCREASE_ON_ENEMY_DEATH
+                        enemy.flag_as_destroyed()
                         self._enemies.remove(enemy)
                         self._bullets.remove(self._bullets[i])
                         break

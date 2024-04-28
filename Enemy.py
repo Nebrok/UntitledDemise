@@ -11,6 +11,8 @@ class Enemy():
         self._dimensions = pygame.Vector2(32,32)
 
         self._playerRelativeTarget = pygame.Vector2(0,0)
+
+        self._destroyed = False
     
     def draw(self):
         positionRect = pygame.Rect(self._position + self._env.get_offset(), (self._dimensions.x,self._dimensions.y))
@@ -37,3 +39,9 @@ class Enemy():
     
     def get_dimensions(self):
         return self._dimensions.copy()
+    
+    def is_destroyed(self):
+        return self._destroyed
+    
+    def flag_as_destroyed(self):
+        self._destroyed = True

@@ -26,6 +26,7 @@ class Player():
         self._rotation = angle
 
     def update_physics(self, dt):
+        self._acceleration *= dt
         self._velocity += self._acceleration * dt
         if self._velocity.magnitude() > PLAYER_MAX_SPEED:
             self._velocity.scale_to_length(PLAYER_MAX_SPEED)
