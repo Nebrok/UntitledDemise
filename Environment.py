@@ -2,6 +2,7 @@ from constants import *
 from Player import Player
 from Enemy import Enemy
 from Asteroid import Asteroid
+from AlienShip import AlienShip
 from Quadtree import QuadTree, AABB
 from perlin_noise import PerlinNoise
 
@@ -175,10 +176,16 @@ class Environment():
         #print("tree update complete")
 
     def update_enemy(self):
+        spawn_location = pygame.Vector2(randint(-HALF_WORLD_WIDTH, HALF_WORLD_WIDTH),
+                                randint(-HALF_WORLD_HEIGHT,HALF_WORLD_HEIGHT))
+        coinflip = random()
+        if coinflip <= 0.005:
+            newEnemy = AlienShip(self, spawn_location.x, spawn_location.y)
+            self._enemies.append(newEnemy)
+
         playerPos = self.player.get_position()
         for enemy in self._enemies:
-            #enemy.move(playerPos)
-            pass
+            enemy.move(playerPos)
 
     def update_physics(self, dt):
         mousePos = pygame.Vector2(pygame.mouse.get_pos())
@@ -199,18 +206,33 @@ class Environment():
                 self._lifeLostFlag = True
                 break
 
-        if len(self._bullets) > 0:
-            for i in range(len(self._bullets)-1, 0-1, -1):
-                self._bullets[i].update_physics(dt)
-                if self._bullets[i].get_age() > 10:
-                    self._bullets.pop(i)
-                    continue
+        for i in range(len(self._bullets)-1, 0-1, -1):
+            self._bullets[i].update_physics(dt)
+            if self._bullets[i].get_age() > 10:
+                self._bullets.pop(i)
+                continue
+
+            if self._bullets[i].get_fired_by() == "Player":
                 area_around_bullet = AABB(self._bullets[i].get_position(), 50, 50)
                 nearby_enemies = self._enemyQuadtree.contained_by(area_around_bullet)
                 for enemy in nearby_enemies:
                     distance = self._bullets[i].get_position().distance_to(enemy.get_position())
                     if distance <= 21 and not enemy.is_destroyed(): #5 + 16 radi of bullet and enemy respectively
                         self._score += SCORE_INCREASE_ON_ENEMY_DEATH
+                        enemy.flag_as_destroyed()
+                        self._enemies.remove(enemy)
+                        self._bullets.remove(self._bullets[i])
+                        break
+            elif self._bullets[i].get_fired_by() == "Alien Ship":
+                if self.player.collides(self._bullets[i]):
+                    self._lifeLostFlag = True
+                    self._bullets.remove(self._bullets[i])
+                    continue
+                area_around_bullet = AABB(self._bullets[i].get_position(), 50, 50)
+                nearby_enemies = self._enemyQuadtree.contained_by(area_around_bullet)
+                for enemy in nearby_enemies:
+                    distance = self._bullets[i].get_position().distance_to(enemy.get_position())
+                    if distance <= 21 and not enemy.is_destroyed(): #5 + 16 radi of bullet and enemy respectively
                         enemy.flag_as_destroyed()
                         self._enemies.remove(enemy)
                         self._bullets.remove(self._bullets[i])

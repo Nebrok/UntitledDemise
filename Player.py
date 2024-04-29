@@ -43,7 +43,7 @@ class Player():
         return self._velocity.copy()
     
     def fire_bullet(self):
-        new_bullet = Bullet(self._env, self._position.copy(), self._rotation, self._velocity.copy())
+        new_bullet = Bullet(self._env, self._position.copy(), self._rotation, self._velocity.copy(), "Player")
         self._env.get_bullets().append(new_bullet)
     
     def collides(self, enemy):

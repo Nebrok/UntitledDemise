@@ -20,3 +20,13 @@ class Asteroid(Enemy):
         self._position += self._velocity * dt
         self._acceleration *= 0
         self._rotation = self._velocity.as_polar()[1]
+    
+    def move(self, playerPosition):
+        """
+        positionDifference = (playerPosition + self._playerRelativeTarget - self._position 
+                              + pygame.Vector2(randint(-10,10),randint(-10,10)))
+        positionDifference.normalize()
+        positionDifference *= 1
+        self._acceleration += positionDifference
+        """
+        pass

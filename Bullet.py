@@ -1,7 +1,7 @@
 from constants import *
 
 class Bullet():
-    def __init__(self, env, position, heading, initialVelocity):
+    def __init__(self, env, position, heading, initialVelocity, fired_by):
         self._env = env
         self._position = position
         self._velocity = (pygame.Vector2(1,0).rotate(heading) * BULLET_SPEED)
@@ -11,12 +11,19 @@ class Bullet():
         self._rotation = 0
         self._heading = heading
 
+        self._fired_by = fired_by
+
         self._age = 0
 
-        self._dimensions = pygame.Vector2(32,32)
+        self._dimensions = pygame.Vector2(10,10)
     
     def draw(self):
-        pygame.draw.circle(pygame.display.get_surface(), BLUE, self._position + self._env.get_offset(), 5)
+        colour = (40, 200, 40)
+        if self._fired_by == "Player":
+            colour = BLUE
+        elif self._fired_by == "Alien Ship":
+            colour = RED
+        pygame.draw.circle(pygame.display.get_surface(), colour, self._position + self._env.get_offset(), 5)
 
     def update_physics(self, dt):
         self._velocity += self._acceleration * dt
@@ -33,3 +40,9 @@ class Bullet():
     
     def get_velocity(self):
         return self._velocity.copy()
+    
+    def get_fired_by(self):
+        return self._fired_by
+    
+    def get_dimensions(self):
+        return self._dimensions

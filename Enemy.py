@@ -13,6 +13,8 @@ class Enemy():
         self._playerRelativeTarget = pygame.Vector2(0,0)
 
         self._destroyed = False
+
+        self._event_timer = 0
     
     def draw(self):
         positionRect = pygame.Rect(self._position + self._env.get_offset(), (self._dimensions.x,self._dimensions.y))
@@ -26,6 +28,12 @@ class Enemy():
             self._velocity.scale_to_length(ENEMY_MAX_SPEED)
         self._position += self._velocity * dt
         self._acceleration *= 0
+
+        flipped_vel = self._velocity.copy()
+        flipped_vel.y *= -1
+        self._rotation = flipped_vel.as_polar()[1]
+
+        self._event_timer += 1 * dt
 
     def move(self, playerPosition):
         positionDifference = (playerPosition + self._playerRelativeTarget - self._position 
