@@ -66,6 +66,10 @@ class Environment():
         for i in range(1000):
             spawn_location = pygame.Vector2(randint(-HALF_WORLD_WIDTH, HALF_WORLD_WIDTH),
                                 randint(-HALF_WORLD_HEIGHT,HALF_WORLD_HEIGHT))
+            #skip location if within 100 pixels of spawn (0,0)
+            if ((spawn_location.x < 100 and spawn_location.x > -100)
+                and spawn_location.y < 100 and spawn_location.y > -100):
+                continue 
             spawn_grid_x_coords = int(math.floor((spawn_location.x + HALF_WORLD_WIDTH) / self._spawn_cell_width)) - 1
             spawn_grid_y_coords = int(math.floor((spawn_location.y + HALF_WORLD_HEIGHT) / self._spawn_cell_height)) - 1
             if self._asteroid_spawn_map[spawn_grid_x_coords][spawn_grid_y_coords] == 1:
@@ -98,12 +102,12 @@ class Environment():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
+            if (event.type == pygame.KEYDOWN and event.key == pygame.K_q) and endFlag:
+                return True
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.gameState = 2
             if (event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN) and srtFlag:
                 self.gameState = 1
-            if (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE) and endFlag:
-                return True
             if event.type == pygame.KEYDOWN and event.key == pygame.K_w and runFlag:
                 self.player.move(pygame.Vector2(0,-movementMag))
             if event.type == pygame.KEYDOWN and event.key == pygame.K_s and runFlag:
@@ -298,7 +302,7 @@ class Environment():
         scoreSurfaceRect = scoreSurface.get_rect(center=(int(WIDTH/2), int(HEIGHT/2)))
         pygame.display.get_surface().blit(scoreSurface, scoreSurfaceRect)
 
-        infoSurface = self._fontInfo.render("Press any button to end the game", True, WHITE)
+        infoSurface = self._fontInfo.render("Press q to end the game", True, WHITE)
         infoSurfaceRect = infoSurface.get_rect(center=(int(WIDTH/2), int(HEIGHT/2) + scoreSurfaceRect.h + 10))
         pygame.display.get_surface().blit(infoSurface, infoSurfaceRect)
 
